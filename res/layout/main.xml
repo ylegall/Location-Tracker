@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+    <TableLayout android:id="@+id/tableLayout1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:stretchColumns="0,1">
+        <TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="5px">
+            <TextView android:id="@+id/status_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/status_label"></TextView>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/status_value" android:text="@string/status_stopped_text"></TextView>
+        </TableRow>
+        <TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/tableRow2" android:padding="5px">
+            <TextView android:id="@+id/count_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/count_text"></TextView>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:id="@+id/count_value"></TextView>
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/tableRow5">
+            <TextView android:layout_height="wrap_content" android:id="@+id/update_min_label" android:layout_width="wrap_content" android:text="@string/update_min_label"></TextView>
+            <LinearLayout android:id="@+id/linearLayout1" android:layout_width="wrap_content" android:orientation="vertical" android:layout_height="wrap_content">
+                <SeekBar android:layout_width="match_parent" android:id="@+id/seek_min" android:layout_height="wrap_content" android:max="59" android:progress="10"></SeekBar>
+                <TextView android:id="@+id/seek_min_value" android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/seek_min_value" android:layout_gravity="center_horizontal"></TextView>
+            </LinearLayout>
+        </TableRow>
+        <TableRow android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/TableRow01">
+            <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/update_hour_label" android:text="@string/update_hour_label"></TextView>
+            <LinearLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/linearLayout2">
+                <SeekBar android:layout_width="match_parent" android:id="@+id/seek_hour" android:layout_height="wrap_content" android:max="24"></SeekBar>
+                <TextView android:layout_height="match_parent" android:layout_width="wrap_content" android:id="@+id/seek_hrs_value" android:text="@string/seek_hrs_value" android:layout_gravity="center_horizontal"></TextView>
+            </LinearLayout>
+        </TableRow>
+        <TableRow android:id="@+id/tableRow3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="5px">
+            <Button android:id="@+id/start_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/play_text"></Button>
+            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/stop_button" android:text="@string/stop_text"></Button>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>

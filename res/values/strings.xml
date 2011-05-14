@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_desc">University of Pittsburgh\nDepartment of Computer Science</string>
+    <string name="app_name">LocationTracker</string>
+    <string name="app_vers">version 1.0</string>
+    <string name="play_text">start service</string>
+    <string name="pause_text">pause service</string>
+    <string name="update_text">update</string>
+    <string name="stop_text">stop service</string>
+    <string name="view_text">view locations</string>
+    <string name="config_text">configure</string>
+    <string name="status_label">service status:</string>
+    <string name="status_stopped_text">inactive</string>
+    <string name="count_text">locations recorded:</string>
+    <string name="update_min_label">update interval (min)</string>
+    <string name="update_hour_label">update interval (hrs)</string>
+    <string name="seek_min_value">10</string>
+    <string name="seek_hrs_value">0</string>
+    <string name="status_started_text">active</string>
+</resources>

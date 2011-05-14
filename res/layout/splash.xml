@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent" android:id="@+id/splash_layout" android:orientation="vertical">
+  
+    <TextView android:layout_height="wrap_content"
+    	android:layout_width="wrap_content"
+    	android:layout_gravity="center_horizontal"
+    	android:id="@+id/splash_title"
+    	android:textColor="#FF0000"
+    	android:textSize="@dimen/large_text"
+    	android:text="@string/app_name" />
+  
+	<ImageView
+		android:id="@+id/splash_image"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:src="@drawable/splash"
+		/>
+
+	<TextView
+		android:id="@+id/splash_version"
+		android:layout_height="wrap_content"
+	    android:layout_width="fill_parent" 
+		android:text="@string/app_vers"
+		android:textColor="@color/sub_text"
+		android:gravity="center_horizontal"
+		android:textSize="@dimen/small_text"
+		/>
+	<TextView android:id="@+id/splash_desc" android:text="@string/app_desc" android:layout_height="wrap_content" android:layout_width="match_parent" android:layout_gravity="center_horizontal" android:gravity="center_horizontal"></TextView>
+  
+</LinearLayout>
