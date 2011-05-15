@@ -2,7 +2,7 @@
 <LinearLayout
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
-  android:layout_height="match_parent">
+  android:layout_height="match_parent" android:orientation="vertical">
     <TableLayout android:id="@+id/tableLayout1" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center_horizontal" android:stretchColumns="0,1">
         <TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="5px">
             <TextView android:id="@+id/status_label" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/status_label"></TextView>
@@ -27,8 +27,9 @@
             </LinearLayout>
         </TableRow>
         <TableRow android:id="@+id/tableRow3" android:layout_width="wrap_content" android:layout_height="wrap_content" android:padding="5px">
-            <Button android:id="@+id/start_button" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/play_text"></Button>
-            <Button android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/stop_button" android:text="@string/stop_text"></Button>
+            <Button android:id="@+id/start_button" android:layout_height="wrap_content" android:text="@string/play_text" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></Button>
+            <Button android:layout_height="wrap_content" android:id="@+id/stop_button" android:text="@string/stop_text" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></Button>
         </TableRow>
     </TableLayout>
+    <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/location_list"></ListView>
 </LinearLayout>
