@@ -3,9 +3,8 @@ package edu.pitt.cs.exposure;
 import java.util.Iterator;
 
 /**
- * 
+ * Used to store the most recent n locations.
  * @author ylegall
- *
  */
 public class RingBuffer<T> implements Iterable<T> {
 

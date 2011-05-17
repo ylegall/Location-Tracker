@@ -31,5 +31,6 @@
             <Button android:layout_height="wrap_content" android:id="@+id/stop_button" android:text="@string/stop_text" android:layout_width="wrap_content" android:layout_gravity="center_horizontal"></Button>
         </TableRow>
     </TableLayout>
+    <TextView android:layout_height="wrap_content" android:layout_gravity="left" android:id="@+id/location_list_label" android:text="@string/location_list_label" android:padding="5px" android:layout_width="match_parent" android:background="@color/label_back"></TextView>
     <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/location_list"></ListView>
 </LinearLayout>

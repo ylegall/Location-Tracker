@@ -6,6 +6,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -13,14 +14,13 @@ import android.util.Log;
 import android.widget.Toast;
 
 /**
- * this service runs in the background and
- * receives location updates periodically.
- * It is designed to only be accessed by the
- * "MainActivity" component, which runs in the same
- * application/process.
+ * this service runs in the background and receives location updates
+ * periodically. It is designed to only be accessed by the "MainActivity"
+ * component, which runs in the same application/process.
  * 
  * getting username
- * http://stackoverflow.com/questions/2727029/how-can-i-get-the-google-username-on-android
+ * http://stackoverflow.com/questions/2727029/how-can-i-get-the-
+ * google-username-on-android
  * 
  * @author ylegall
  */
@@ -51,15 +51,15 @@ public class LocationService extends Service implements LocationListener {
 	private ServiceBinder binder;
 
 	/**
-	 * when an activity binds to this service,
-	 * it receives an instance of this inner class,
-	 * which provides access to the following interface:
+	 * when an activity binds to this service, it receives an instance of this
+	 * inner class, which provides access to the following interface:
 	 */
 	class ServiceBinder extends Binder {
 
 		/**
 		 * allows the activity to register itself with this service for
 		 * service-to-activity communication
+		 * 
 		 * @param activity
 		 */
 		void registerActivity(MainActivity ma) {
@@ -79,7 +79,8 @@ public class LocationService extends Service implements LocationListener {
 	public void onCreate() {
 		Log.d(TAG, "LocationService: onCreate");
 		locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-		ringBuffer = new RingBuffer<SimpleLocation>(BaseActivity.DEFUALT_HISTORY_SIZE);
+		ringBuffer = new RingBuffer<SimpleLocation>(
+				BaseActivity.DEFUALT_HISTORY_SIZE);
 		updateInterval = getMilliseconds(BaseActivity.DEFUALT_UPDATE_MIN,
 				BaseActivity.DEFUALT_UPDATE_HRS);
 
@@ -91,10 +92,9 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * this is invoked by the system whenever startService() is
-	 * called with an Intent targeted for this service. This
-	 * provides an easy way for an activity to communicate with
-	 * or control this service.
+	 * this is invoked by the system whenever startService() is called with an
+	 * Intent targeted for this service. This provides an easy way for an
+	 * activity to communicate with or control this service.
 	 */
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -194,13 +194,13 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * called when a new location fix is acquired.
-	 * TODO transmit location to remote database
+	 * called when a new location fix is acquired. TODO transmit location to
+	 * remote database
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
 		Log.i(TAG, "LocationService: location updated");
-		ringBuffer.add(new SimpleLocation(location));
+		ringBuffer.add(new SimpleLocation(getApplicationContext(), location));
 		count++;
 		notifyActivity(UPDATE_LOCATION);
 		Toast.makeText(this, "location updated", Toast.LENGTH_SHORT).show();
@@ -221,5 +221,16 @@ public class LocationService extends Service implements LocationListener {
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		Log.d(TAG, "LocationService: status changed: " + arg0);
+		switch(arg1) {
+			case LocationProvider.AVAILABLE:
+				Log.d(TAG, "\t available");
+				break;
+			case LocationProvider.TEMPORARILY_UNAVAILABLE:
+				Log.d(TAG, "\t temporarily unavailable");
+				break;
+			case LocationProvider.OUT_OF_SERVICE:
+				Log.d(TAG, "\t out of service");
+				break;
+		}
 	}
 }

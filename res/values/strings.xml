@@ -17,4 +17,5 @@
     <string name="seek_min_value">10</string>
     <string name="seek_hrs_value">0</string>
     <string name="status_started_text">active</string>
+    <string name="location_list_label">recent locations:</string>
 </resources>

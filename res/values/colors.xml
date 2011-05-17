@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 <color name="sub_text">#3366DD</color>
+<color name="label_back">#000066</color>
 </resources>

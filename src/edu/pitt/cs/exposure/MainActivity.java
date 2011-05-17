@@ -20,6 +20,11 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import edu.pitt.cs.exposure.LocationService.ServiceBinder;
 
+/**
+ * provides a simple administrative interface
+ * to control the LocationTracker service
+ * @author ylegall
+ */
 public class MainActivity extends BaseActivity implements OnClickListener,
 		OnSeekBarChangeListener, OnItemClickListener {
 
@@ -27,8 +32,15 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	private ServiceBinder binder;
 	private ArrayAdapter<SimpleLocation> adapter;
 	
+	private Button startButton, stopButton;
+	private SeekBar minuteSeek, hourSeek;
+	private TextView statusText, countText;
+	private TextView minuteText, hourText;
+	private ListView listView;
+	
 	/**
-	 * 
+	 * called when the activity is create.
+	 * get handles to widgets and setup event handlers.
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,23 +49,27 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
 		setContentView(R.layout.main);
 
-		Button button = (Button) findViewById(R.id.start_button);
-		button.setOnClickListener(this);
+		startButton = (Button) findViewById(R.id.start_button);
+		startButton.setOnClickListener(this);
 
-		button = (Button) findViewById(R.id.stop_button);
-		button.setOnClickListener(this);
+		stopButton = (Button) findViewById(R.id.stop_button);
+		stopButton.setOnClickListener(this);
 
-		SeekBar seek = (SeekBar) findViewById(R.id.seek_min);
-		seek.setOnSeekBarChangeListener(this);
+		minuteSeek = (SeekBar) findViewById(R.id.seek_min);
+		minuteSeek.setOnSeekBarChangeListener(this);
 
-		seek = (SeekBar) findViewById(R.id.seek_hour);
-		seek.setOnSeekBarChangeListener(this);
+		hourSeek = (SeekBar) findViewById(R.id.seek_hour);
+		hourSeek.setOnSeekBarChangeListener(this);
 		
-		// TODO: allow listView to be clicked
+		statusText = (TextView)findViewById(R.id.status_value);
+		countText = (TextView)findViewById(R.id.count_value);
+		minuteText = (TextView)findViewById(R.id.seek_min_value);
+		hourText = (TextView)findViewById(R.id.seek_hrs_value);
+		
 		adapter = new ArrayAdapter<SimpleLocation>(this,R.layout.list_item);
-		ListView lv = (ListView)findViewById(R.id.location_list);
-		lv.setOnItemClickListener(this);
-		lv.setAdapter(adapter);
+		listView = (ListView)findViewById(R.id.location_list);
+		listView.setOnItemClickListener(this);
+		listView.setAdapter(adapter);
 	}
 
 	@Override
@@ -66,7 +82,9 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	protected void onStart() {
 		Log.i(TAG, "MainActivity: onStart");
 		super.onStart();
-		bindService(new Intent(this, LocationService.class), connection, BIND_AUTO_CREATE);
+		bindService(new Intent(this, LocationService.class),
+				connection,
+				BIND_AUTO_CREATE);
 		loadSettings();
 		updateStatus();
 		updateLocations();
@@ -82,60 +100,35 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		}
 		super.onStop();
 	}
-	
-	
-//	@Override
-//	protected void onPause() {
-//		Log.i(TAG, "MainActivity: onPause");
-//		unregisterReceiver(receiver);
-//		super.onPause();
-//	}
-//
-//	@Override
-//	protected void onResume() {
-//		Log.i(TAG, "MainActivity: onResume");
-//		super.onResume();
-//		IntentFilter filter = new IntentFilter(TAG);
-//		registerReceiver(receiver, filter);
-//	}
 
 	/**
-	 * 
+	 * use the sharedPreferences to load the state of the sliders.
 	 */
 	private void loadSettings() {
-		
-		// Restore preferences
 		Log.i(TAG, "MainActivity: loading settings");
 		SharedPreferences settings = getPreferences(MODE_PRIVATE);
-		int update_minutes = settings.getInt("update_minutes", DEFUALT_UPDATE_MIN);
+		int update_minutes = settings.getInt("update_minutes",
+				DEFUALT_UPDATE_MIN);
 		int update_hours = settings.getInt("update_hours", DEFUALT_UPDATE_HRS);
-		
-		SeekBar seek = (SeekBar) findViewById(R.id.seek_min);
-		seek.setProgress(update_minutes);
-		
-		seek = (SeekBar) findViewById(R.id.seek_hour);
-		seek.setProgress(update_hours);
+		minuteSeek.setProgress(update_minutes);
+		hourSeek.setProgress(update_hours);
 	}
 
 	/**
-	 * save the value of the settings
+	 * use the sharedPreferences to save the state of the sliders.
 	 */
 	private void saveSettings() {
 		Log.i(TAG, "MainActivity: saving settings");
 		SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
-		
-		SeekBar seek = (SeekBar) findViewById(R.id.seek_min);
-		editor.putInt("update_minutes", seek.getProgress());
-		
-		seek = (SeekBar) findViewById(R.id.seek_hour);
-		editor.putInt("update_hours", seek.getProgress());
+		editor.putInt("update_minutes", minuteSeek.getProgress());
+		editor.putInt("update_hours", hourSeek.getProgress());
 		editor.commit();
 	}
 	
 	/**
 	 * the service calls this method to indicate
 	 * that this activity should update its UI.
-	 * @param statusChange
+	 * @param statusChange the type of change of the service.
 	 */
 	void onServiceStatusChange(int statusChange) {
 		switch (statusChange) {
@@ -151,64 +144,49 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	}
 	
 	/**
-	 * updates the recent locations list
+	 * updates the recent locations list.
 	 */
 	private void updateLocations() {
 		Log.i(TAG, "MainActivity: updating location list");
-		TextView tv = (TextView)findViewById(R.id.count_value);
-		tv.setText(LocationService.count + "");
+		countText.setText(LocationService.count + "");
 		
 		if (isBound) {
 			adapter.clear();
-			ListView lv = (ListView)findViewById(R.id.location_list);
 			RingBuffer<SimpleLocation> buffer = binder.getRecentLocations();
 			for (SimpleLocation loc: buffer) {
 				adapter.add(loc);
 			}
 			adapter.notifyDataSetChanged();
-			lv.invalidate();
+			listView.invalidate();
 		}
 	}
 	
 	/**
 	 * updates the buttons and text labels of this
 	 * activity to reflect the recent status change in
-	 * the LocationService
+	 * the LocationService.
 	 */
 	private void updateStatus() {
-		Button button;
-		TextView tv;
-		
 		Log.i(TAG, "MainActivity: checking service status");
 		switch (LocationService.status) {
 			
 			case LocationService.STATUS_STARTED:
-				tv = (TextView)findViewById(R.id.status_value);
-				tv.setText(R.string.status_started_text);
-				tv.setTextColor(Color.CYAN);
-				button = (Button)findViewById(R.id.start_button);
-				button.setEnabled(false);
-				button = (Button)findViewById(R.id.stop_button);
-				button.setEnabled(true);
+				statusText.setText(R.string.status_started_text);
+				statusText.setTextColor(Color.CYAN);
+				startButton.setEnabled(false);
+				stopButton.setEnabled(true);
 				break;
 	
-			case LocationService.STATUS_PAUSED:
-				break;
+//			case LocationService.STATUS_PAUSED:
+//				break;
 	
 			case LocationService.STATUS_STOPPED:
-				tv = (TextView)findViewById(R.id.status_value);
-				tv.setText(R.string.status_stopped_text);
-				tv.setTextColor(Color.RED);
-				button = (Button)findViewById(R.id.stop_button);
-				button.setEnabled(false);
-				button = (Button)findViewById(R.id.start_button);
-				button.setEnabled(true);
+				statusText.setText(R.string.status_stopped_text);
+				statusText.setTextColor(Color.RED);
+				stopButton.setEnabled(false);
+				startButton.setEnabled(true);
 				break;
 		}
-	}
-	
-	private int getProgress(int id) {
-		return ((SeekBar)findViewById(id)).getProgress();
 	}
 	
 	/**
@@ -234,7 +212,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	};
 	
 	/**
-	 * TODO: communicate with Service
+	 * communicate with Service
 	 */
 	@Override
 	public void onClick(View v) {
@@ -244,8 +222,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 			case R.id.start_button:
 				Log.i(TAG, "MainActivity: start clicked");
 				intent.putExtra("action", LocationService.ACTION_START);
-				intent.putExtra("interval_minutes", getProgress(R.id.seek_min));
-				intent.putExtra("interval_hours", getProgress(R.id.seek_hour));
+				intent.putExtra("interval_minutes", minuteSeek.getProgress());
+				intent.putExtra("interval_hours", hourSeek.getProgress());
 				startService(intent);
 				break;
 	
@@ -253,27 +231,22 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				Log.i(TAG, "MainActivity: stop clicked");
 				intent.putExtra("action", LocationService.ACTION_STOP);
 				startService(intent);
-	//			stopService(intent);
+	//			stopService(intent); // the service can call stopSelf()
 				break;
-				
-			// TODO: pause button
 		}
 	}
 
 	/**
-	 * TODO: update the service with the new settings
+	 * update the service with the new settings
 	 */
 	@Override
-	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-		TextView tv;
-		switch (seekBar.getId()) {
+	public void onProgressChanged(SeekBar seek, int prog, boolean fromUser) {
+		switch (seek.getId()) {
 			case R.id.seek_min:
-				tv = (TextView) findViewById(R.id.seek_min_value);
-				tv.setText(progress + "");
+				minuteText.setText(prog + "");
 				break;
 			case R.id.seek_hour:
-				tv = (TextView) findViewById(R.id.seek_hrs_value);
-				tv.setText(progress + "");
+				hourText.setText(prog + "");
 				break;
 		}
 	}
@@ -290,10 +263,12 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		switch (seekBar.getId()) {
 			case R.id.seek_min:
-				Log.i(TAG, "MainActivity: minute bar stopped at " + seekBar.getProgress());
+				Log.i(TAG, "MainActivity: minute bar stopped at " +
+						seekBar.getProgress());
 				break;
 			case R.id.seek_hour:
-				Log.i(TAG, "MainActivity: hour bar stopped at " + seekBar.getProgress());
+				Log.i(TAG, "MainActivity: hour bar stopped at " +
+						seekBar.getProgress());
 				break;
 		}
 		
@@ -302,17 +277,18 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		if (LocationService.status == LocationService.STATUS_STARTED) {
 			Intent intent = new Intent(this, LocationService.class);
 			intent.putExtra("action", LocationService.ACTION_START);
-			intent.putExtra("interval_minutes", getProgress(R.id.seek_min));
-			intent.putExtra("interval_hours", getProgress(R.id.seek_hour));
+			intent.putExtra("interval_minutes", minuteSeek.getProgress());
+			intent.putExtra("interval_hours", hourSeek.getProgress());
 			startService(intent);
 		}
 	}
 
 	/**
 	 * callback for when one of the list items is clicked
+	 * TODO: so something here?
 	 */
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
+	public void onItemClick(AdapterView<?> av, View v, int i, long l) {
 		Log.i(TAG, "MainActivity: list item clicked");
 	}
 
