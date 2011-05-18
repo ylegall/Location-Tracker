@@ -115,13 +115,13 @@ public class LocationService extends Service implements LocationListener {
 				}
 				listenForLocation();
 				break;
-	
+
 			case ACTION_STOP:
 				stopListening();
 				status = STATUS_STOPPED;
 				stopSelf();
 				break;
-	
+
 			case ACTION_PAUSE:
 				// TODO:
 				break;
@@ -221,7 +221,7 @@ public class LocationService extends Service implements LocationListener {
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 		Log.d(TAG, "LocationService: status changed: " + arg0);
-		switch(arg1) {
+		switch (arg1) {
 			case LocationProvider.AVAILABLE:
 				Log.d(TAG, "\t available");
 				break;

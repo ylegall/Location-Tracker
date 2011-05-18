@@ -21,8 +21,9 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import edu.pitt.cs.exposure.LocationService.ServiceBinder;
 
 /**
- * provides a simple administrative interface
- * to control the LocationTracker service
+ * provides a simple administrative interface to control the LocationTracker
+ * service
+ * 
  * @author ylegall
  */
 public class MainActivity extends BaseActivity implements OnClickListener,
@@ -31,16 +32,16 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	private boolean isBound;
 	private ServiceBinder binder;
 	private ArrayAdapter<SimpleLocation> adapter;
-	
+
 	private Button startButton, stopButton;
 	private SeekBar minuteSeek, hourSeek;
 	private TextView statusText, countText;
 	private TextView minuteText, hourText;
 	private ListView listView;
-	
+
 	/**
-	 * called when the activity is create.
-	 * get handles to widgets and setup event handlers.
+	 * called when the activity is create. get handles to widgets and setup
+	 * event handlers.
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +61,14 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
 		hourSeek = (SeekBar) findViewById(R.id.seek_hour);
 		hourSeek.setOnSeekBarChangeListener(this);
-		
-		statusText = (TextView)findViewById(R.id.status_value);
-		countText = (TextView)findViewById(R.id.count_value);
-		minuteText = (TextView)findViewById(R.id.seek_min_value);
-		hourText = (TextView)findViewById(R.id.seek_hrs_value);
-		
-		adapter = new ArrayAdapter<SimpleLocation>(this,R.layout.list_item);
-		listView = (ListView)findViewById(R.id.location_list);
+
+		statusText = (TextView) findViewById(R.id.status_value);
+		countText = (TextView) findViewById(R.id.count_value);
+		minuteText = (TextView) findViewById(R.id.seek_min_value);
+		hourText = (TextView) findViewById(R.id.seek_hrs_value);
+
+		adapter = new ArrayAdapter<SimpleLocation>(this, R.layout.list_item);
+		listView = (ListView) findViewById(R.id.location_list);
 		listView.setOnItemClickListener(this);
 		listView.setAdapter(adapter);
 	}
@@ -82,8 +83,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	protected void onStart() {
 		Log.i(TAG, "MainActivity: onStart");
 		super.onStart();
-		bindService(new Intent(this, LocationService.class),
-				connection,
+		bindService(new Intent(this, LocationService.class), connection,
 				BIND_AUTO_CREATE);
 		loadSettings();
 		updateStatus();
@@ -124,11 +124,13 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		editor.putInt("update_hours", hourSeek.getProgress());
 		editor.commit();
 	}
-	
+
 	/**
-	 * the service calls this method to indicate
-	 * that this activity should update its UI.
-	 * @param statusChange the type of change of the service.
+	 * the service calls this method to indicate that this activity should
+	 * update its UI.
+	 * 
+	 * @param statusChange
+	 *            the type of change of the service.
 	 */
 	void onServiceStatusChange(int statusChange) {
 		switch (statusChange) {
@@ -142,44 +144,43 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				break;
 		}
 	}
-	
+
 	/**
 	 * updates the recent locations list.
 	 */
 	private void updateLocations() {
 		Log.i(TAG, "MainActivity: updating location list");
 		countText.setText(LocationService.count + "");
-		
+
 		if (isBound) {
 			adapter.clear();
 			RingBuffer<SimpleLocation> buffer = binder.getRecentLocations();
-			for (SimpleLocation loc: buffer) {
+			for (SimpleLocation loc : buffer) {
 				adapter.add(loc);
 			}
 			adapter.notifyDataSetChanged();
-			listView.invalidate();
+//			listView.invalidate();
 		}
 	}
-	
+
 	/**
-	 * updates the buttons and text labels of this
-	 * activity to reflect the recent status change in
-	 * the LocationService.
+	 * updates the buttons and text labels of this activity to reflect the
+	 * recent status change in the LocationService.
 	 */
 	private void updateStatus() {
 		Log.i(TAG, "MainActivity: checking service status");
 		switch (LocationService.status) {
-			
+
 			case LocationService.STATUS_STARTED:
 				statusText.setText(R.string.status_started_text);
 				statusText.setTextColor(Color.CYAN);
 				startButton.setEnabled(false);
 				stopButton.setEnabled(true);
 				break;
-	
-//			case LocationService.STATUS_PAUSED:
-//				break;
-	
+
+			// case LocationService.STATUS_PAUSED:
+			// break;
+
 			case LocationService.STATUS_STOPPED:
 				statusText.setText(R.string.status_stopped_text);
 				statusText.setTextColor(Color.RED);
@@ -188,36 +189,36 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				break;
 		}
 	}
-	
+
 	/**
 	 * callbacks for binding to the LocationService
 	 */
 	private ServiceConnection connection = new ServiceConnection() {
-		
+
 		@Override
 		public void onServiceDisconnected(ComponentName name) {
 			Log.i(TAG, "MainActivity: service unbound");
 			isBound = false;
 		}
-		
+
 		@Override
 		public void onServiceConnected(ComponentName name, IBinder service) {
 			Log.i(TAG, "MainActivity: service bound");
 			isBound = true;
-			binder = (ServiceBinder)service;
+			binder = (ServiceBinder) service;
 			binder.registerActivity(MainActivity.this);
 			updateStatus();
 			updateLocations();
 		}
 	};
-	
+
 	/**
 	 * communicate with Service
 	 */
 	@Override
 	public void onClick(View v) {
 		Intent intent = new Intent(this, LocationService.class);
-		
+
 		switch (v.getId()) {
 			case R.id.start_button:
 				Log.i(TAG, "MainActivity: start clicked");
@@ -226,12 +227,12 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				intent.putExtra("interval_hours", hourSeek.getProgress());
 				startService(intent);
 				break;
-	
+
 			case R.id.stop_button:
 				Log.i(TAG, "MainActivity: stop clicked");
 				intent.putExtra("action", LocationService.ACTION_STOP);
 				startService(intent);
-	//			stopService(intent); // the service can call stopSelf()
+				// stopService(intent); // the service can call stopSelf()
 				break;
 		}
 	}
@@ -250,28 +251,28 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				break;
 		}
 	}
-	
+
 	@Override
-	public void onStartTrackingTouch(SeekBar seekBar) {}
+	public void onStartTrackingTouch(SeekBar seekBar) {
+	}
 
 	/**
-	 * called when the user stops sliding the bar.
-	 * updates the interval of the service when
-	 * the slider bars are modified.
+	 * called when the user stops sliding the bar. updates the interval of the
+	 * service when the slider bars are modified.
 	 */
 	@Override
 	public void onStopTrackingTouch(SeekBar seekBar) {
 		switch (seekBar.getId()) {
 			case R.id.seek_min:
-				Log.i(TAG, "MainActivity: minute bar stopped at " +
-						seekBar.getProgress());
+				Log.i(TAG, "MainActivity: minute bar stopped at "
+						+ seekBar.getProgress());
 				break;
 			case R.id.seek_hour:
-				Log.i(TAG, "MainActivity: hour bar stopped at " +
-						seekBar.getProgress());
+				Log.i(TAG, "MainActivity: hour bar stopped at "
+						+ seekBar.getProgress());
 				break;
 		}
-		
+
 		// if the service is running, then tell it to
 		// change the interval at which it receives location updates
 		if (LocationService.status == LocationService.STATUS_STARTED) {
