@@ -38,6 +38,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	private TextView statusText, countText;
 	private TextView minuteText, hourText;
 	private ListView listView;
+	
+	private String username, password;
 
 	/**
 	 * called when the activity is create. get handles to widgets and setup
@@ -47,7 +49,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.i(TAG, "MainActivity: onCreate");
-
+		
 		setContentView(R.layout.main);
 
 		startButton = (Button) findViewById(R.id.start_button);
@@ -112,6 +114,16 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		int update_hours = settings.getInt("update_hours", DEFUALT_UPDATE_HRS);
 		minuteSeek.setProgress(update_minutes);
 		hourSeek.setProgress(update_hours);
+		
+		// get the username and password
+		String user = settings.getString("username", null);
+		String pass = settings.getString("password",null);
+		if (user == null || pass == null) {
+			Log.i(TAG, "MainActivity: username and password are empty.");
+			startActivityForResult(new Intent(this,LoginActivity.class), 0);
+		} else {
+			Log.i(TAG, "MainActivity: username & password acquired.");
+		}
 	}
 
 	/**
@@ -122,6 +134,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
 		editor.putInt("update_minutes", minuteSeek.getProgress());
 		editor.putInt("update_hours", hourSeek.getProgress());
+		editor.putString("username", username);
+		editor.putString("password", password);
 		editor.commit();
 	}
 
@@ -224,6 +238,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				intent.putExtra("action", LocationService.ACTION_START);
 				intent.putExtra("interval_minutes", minuteSeek.getProgress());
 				intent.putExtra("interval_hours", hourSeek.getProgress());
+				intent.putExtra("username", username);
+				intent.putExtra("password", password);
 				startService(intent);
 				break;
 
@@ -280,6 +296,20 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 			intent.putExtra("interval_minutes", minuteSeek.getProgress());
 			intent.putExtra("interval_hours", hourSeek.getProgress());
 			startService(intent);
+		}
+	}
+	
+	
+	// called after the user enters a username and password
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		switch (requestCode) {
+			case 0:
+				username = data.getStringExtra("username");
+				password = data.getStringExtra("password");
+				saveSettings();
+				break;
 		}
 	}
 

@@ -18,4 +18,7 @@
     <string name="seek_hrs_value">0</string>
     <string name="status_started_text">active</string>
     <string name="location_list_label">recent locations:</string>
+    <string name="user_text">username</string>
+    <string name="pass_text">password</string>
+    <string name="submit_button">submit</string>
 </resources>

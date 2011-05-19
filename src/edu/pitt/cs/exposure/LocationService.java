@@ -49,6 +49,7 @@ public class LocationService extends Service implements LocationListener {
 	private RingBuffer<SimpleLocation> ringBuffer;
 
 	private ServiceBinder binder;
+	private String username, password;
 
 	/**
 	 * when an activity binds to this service, it receives an instance of this
@@ -104,6 +105,8 @@ public class LocationService extends Service implements LocationListener {
 
 		switch (action) {
 			case ACTION_START:
+				username = intent.getStringExtra("username");
+				password = intent.getStringExtra("password");
 				int minutes = intent.getIntExtra("interval_minutes",
 						BaseActivity.DEFUALT_UPDATE_MIN);
 				int hours = intent.getIntExtra("interval_hours",
@@ -194,8 +197,8 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * called when a new location fix is acquired. TODO transmit location to
-	 * remote database
+	 * called when a new location fix is acquired.
+	 * TODO transmit location to remote database.
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
@@ -206,6 +209,8 @@ public class LocationService extends Service implements LocationListener {
 		Toast.makeText(this, "location updated", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "location = (" + location.getLatitude() + ","
 				+ location.getLongitude() + ")");
+		
+		// TODO transmit location
 	}
 
 	@Override
