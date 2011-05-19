@@ -159,7 +159,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				adapter.add(loc);
 			}
 			adapter.notifyDataSetChanged();
-//			listView.invalidate();
 		}
 	}
 

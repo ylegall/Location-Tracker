@@ -30,25 +30,28 @@ public class SimpleLocation extends Location {
 	}
 
 	public String getAddressString() {
-		Geocoder coder = new Geocoder(context, Locale.getDefault());
-		try {
-			List<Address> addresses = coder.getFromLocation(getLatitude(),
-					getLongitude(), 1);
-			if (addresses != null && !addresses.isEmpty()) {
-				Address a = addresses.get(0);
-				StringBuilder sb = new StringBuilder();
-				sb.append(a.getCountryName()).append(',');
-				sb.append(a.getLocality()).append(',');
-				sb.append(a.getPostalCode());
-				return sb.toString();
+//		if (Geocoder.isPresent()) {		// API level 9
+			Geocoder coder = new Geocoder(context, Locale.getDefault());
+			try {
+				List<Address> addresses = coder.getFromLocation(getLatitude(),
+						getLongitude(), 1);
+				if (addresses != null && !addresses.isEmpty()) {
+					Address a = addresses.get(0);
+					StringBuilder sb = new StringBuilder();
+					sb.append(a.getCountryName()).append(',');
+					sb.append(a.getLocality()).append(',');
+					sb.append(a.getPostalCode());
+					return sb.toString();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+//		} else {
+//			Log.d(BaseActivity.TAG, "geocoder not present.");
+//		}
 
 		Log.d(BaseActivity.TAG, "failed to get address from geocoder.");
 		return getCoordinateString();
-		// return "unkown";
 	}
 
 	public String getCoordinateString() {
