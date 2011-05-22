@@ -4,12 +4,12 @@
   android:layout_width="match_parent"
   android:layout_height="match_parent" android:stretchColumns="0,1">
     <TableRow android:id="@+id/tableRow1" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/user_text" android:id="@+id/user_text" android:layout_gravity="center"></TextView>
-        <EditText android:text="EditText" android:layout_height="wrap_content" android:id="@+id/user_edit" android:layout_width="wrap_content"></EditText>
+        <TextView android:layout_height="wrap_content" android:text="@string/user_text" android:id="@+id/user_text" android:layout_gravity="center" android:layout_width="match_parent"></TextView>
+        <EditText android:text="EditText" android:layout_height="wrap_content" android:id="@+id/user_edit" android:layout_width="match_parent"></EditText>
     </TableRow>
     <TableRow android:id="@+id/tableRow2" android:layout_width="wrap_content" android:layout_height="wrap_content">
-        <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:text="@string/pass_text" android:id="@+id/pass_text" android:layout_gravity="center"></TextView>
-        <EditText android:text="EditText" android:layout_height="wrap_content" android:id="@+id/pass_edit" android:layout_width="wrap_content" android:password="true"></EditText>
+        <TextView android:layout_height="wrap_content" android:text="@string/pass_text" android:id="@+id/pass_text" android:layout_gravity="center" android:layout_width="match_parent"></TextView>
+        <EditText android:text="EditText" android:layout_height="wrap_content" android:id="@+id/pass_edit" android:password="true" android:layout_width="match_parent"></EditText>
     </TableRow>
-    <Button android:layout_height="wrap_content" android:text="@string/submit_button" android:layout_width="wrap_content" android:id="@+id/submit_button"></Button>
+    <Button android:layout_height="wrap_content" android:text="@string/submit_button" android:id="@+id/submit_button" android:layout_width="wrap_content"></Button>
 </TableLayout>

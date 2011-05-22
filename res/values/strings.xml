@@ -11,7 +11,7 @@
     <string name="config_text">configure</string>
     <string name="status_label">service status:</string>
     <string name="status_stopped_text">inactive</string>
-    <string name="count_text">locations recorded:</string>
+    <string name="provider_text">location provider:</string>
     <string name="update_min_label">update interval (min)</string>
     <string name="update_hour_label">update interval (hrs)</string>
     <string name="seek_min_value">10</string>

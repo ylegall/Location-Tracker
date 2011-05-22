@@ -35,7 +35,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
 	private Button startButton, stopButton;
 	private SeekBar minuteSeek, hourSeek;
-	private TextView statusText, countText;
+	private TextView statusText, providerText;
 	private TextView minuteText, hourText;
 	private ListView listView;
 	
@@ -65,7 +65,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		hourSeek.setOnSeekBarChangeListener(this);
 
 		statusText = (TextView) findViewById(R.id.status_value);
-		countText = (TextView) findViewById(R.id.count_value);
+		providerText = (TextView) findViewById(R.id.provider_value);
 		minuteText = (TextView) findViewById(R.id.seek_min_value);
 		hourText = (TextView) findViewById(R.id.seek_hrs_value);
 
@@ -164,7 +164,6 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	 */
 	private void updateLocations() {
 		Log.i(TAG, "MainActivity: updating location list");
-		countText.setText(LocationService.count + "");
 
 		if (isBound) {
 			adapter.clear();
@@ -189,6 +188,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				statusText.setTextColor(Color.CYAN);
 				startButton.setEnabled(false);
 				stopButton.setEnabled(true);
+				providerText.setText(LocationService.provider);
 				break;
 
 			// case LocationService.STATUS_PAUSED:
@@ -199,6 +199,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				statusText.setTextColor(Color.RED);
 				stopButton.setEnabled(false);
 				startButton.setEnabled(true);
+				providerText.setText("");
 				break;
 		}
 	}
@@ -309,6 +310,9 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 				username = data.getStringExtra("username");
 				password = data.getStringExtra("password");
 				saveSettings();
+				if (LocationService.status == LocationService.STATUS_STARTED) {
+					
+				}
 				break;
 		}
 	}

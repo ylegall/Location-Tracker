@@ -41,9 +41,9 @@ public class LocationService extends Service implements LocationListener {
 
 	static int status;
 	static int count;
+	static String provider;
 
 	private LocationManager locationManager;
-	private String provider;
 	private long updateInterval; // milliseconds
 	private MainActivity activity;
 	private RingBuffer<SimpleLocation> ringBuffer;
@@ -172,7 +172,7 @@ public class LocationService extends Service implements LocationListener {
 		Log.i(TAG, "LocationService: listening for location. interval = "
 				+ updateInterval);
 		Log.i(TAG, "LocationService: provider = " + provider);
-		locationManager.requestLocationUpdates(this.provider, updateInterval,
+		locationManager.requestLocationUpdates(provider, updateInterval,
 				0, this);
 		status = STATUS_STARTED;
 		notifyActivity(UPDATE_STATUS);
@@ -185,7 +185,9 @@ public class LocationService extends Service implements LocationListener {
 	private void stopListening() {
 		Log.i(TAG, "LocationService: NOT listening for location!");
 		locationManager.removeUpdates(this);
-		serverApi.close();
+		if (serverApi != null) {
+			serverApi.close();
+		}
 		status = STATUS_STOPPED;
 		notifyActivity(UPDATE_STATUS);
 		Toast.makeText(this, "service stopped", Toast.LENGTH_SHORT).show();
@@ -226,8 +228,8 @@ public class LocationService extends Service implements LocationListener {
 				+ location.getLongitude() + ")");
 
 		// transmit location:
-		serverApi.pushLocation(location.getLatitude(),
-				location.getLongitude(), null);
+//		serverApi.pushLocation(location.getLatitude(),
+//				location.getLongitude(), null);
 	}
 
 	@Override
