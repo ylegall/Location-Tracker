@@ -15,12 +15,11 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.params.ConnManagerPNames;
-import org.apache.http.conn.params.ConnPerRouteBean;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.impl.conn.SingleClientConnManager;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpProtocolParams;
@@ -28,43 +27,23 @@ import org.apache.http.params.HttpProtocolParams;
 import android.util.Log;
 
 /**
- * A class to access the exposure server API at a given server.
- * 
- * @author Roman Schlegel
+ * handles pushing Location data to the server.
  */
 public class LocationServerApi {
 
-	private String _username;
-	private String _password;
-	// double _argLat;
-	// double _argLon;
-	// String _argAddress;
-
 	/**
-	 * The URL for the server, should be the complete except the last part,
-	 * e.g.: http://saarinen.soic.indiana.edu/exposure/
+	 * The URL for the server: http://saarinen.soic.indiana.edu/exposure/
 	 */
 	private String _serverURL;
 	static final String DEFAULT_SERVER_URL = "http://saarinen.soic.indiana.edu/exposure/";
 
-	private HttpClient _httpClient;
-
+	private ClientConnectionManager _manager;
+	private BasicHttpParams _params;
+	private NameValuePair _username;
+	private NameValuePair _password;
+	
 	/**
-	 * Connection manager for HTTPS connection
-	 */
-	// private ThreadSafeClientConnManager _cm;
-	/**
-	 * Scheme registry needed for HTTPS connection.
-	 */
-	// private SchemeRegistry _schemeRegistry;
-	/**
-	 * HTTP parameters needed for HTTPS connection.
-	 */
-	// private BasicHttpParams _httpParams;
-
-	/**
-	 * Initialises a new server API using the default URL.
-	 * 
+	 * Initializes a new server API using the default URL.
 	 * @param user The user used for authentication.
 	 * @param pass The password for the the user.
 	 */
@@ -73,92 +52,46 @@ public class LocationServerApi {
 	}
 
 	/**
-	 * Initialises a new server API.
-	 * 
+	 * Initializes a new server API.
 	 * @param user The user used for authentication.
 	 * @param pass The password for the user.
-	 * @param url The base url for the API.
+	 * @param url The base URL for the API.
 	 */
 	public LocationServerApi(String user, String pass, String url) {
-		_username = user;
-		_password = pass;
+
+		_username = new BasicNameValuePair("user", user);
+		_password = new BasicNameValuePair("pw", pass);
 		_serverURL = url;
 		if (!_serverURL.endsWith("/")) {
-			_serverURL = _serverURL + "/";
+			_serverURL += "/";
 		}
 
-		// initialise SSL
+		// initialize SSL
 		SchemeRegistry reg = new SchemeRegistry();
 		reg.register(new Scheme("https", new EasySSLSocketFactory(), 443));
 
-		BasicHttpParams params = new BasicHttpParams();
-		params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 30);
-		params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE,
-				new ConnPerRouteBean(30));
-		params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
-		HttpProtocolParams.setVersion(params, HttpVersion.HTTP_1_1);
+		// BasicHttpParams params = new BasicHttpParams();
+		_params = new BasicHttpParams();
+		// _params.setParameter(ConnManagerPNames.MAX_TOTAL_CONNECTIONS, 30);
+		// _params.setParameter(ConnManagerPNames.MAX_CONNECTIONS_PER_ROUTE,
+		// new ConnPerRouteBean(30));
+		_params.setParameter(HttpProtocolParams.USE_EXPECT_CONTINUE, false);
+		HttpProtocolParams.setVersion(_params, HttpVersion.HTTP_1_1);
 
-		_httpClient = new DefaultHttpClient(new ThreadSafeClientConnManager(
-				params, reg), params);
+//		_manager = new ThreadSafeClientConnManager(_params, reg);
+		_manager = new SingleClientConnManager(_params, reg);
 	}
 
-	// /**
-	// * This method is called by a new thread whenever a new request is made.
-	// */
-	// public void run() {
-	// // double argLat = 0.0;
-	// // double argLon = 0.0;
-	// // String argAddress = null;
-	//
-	// synchronized (this) {
-	// // copy arguments
-	// // push location
-	// // argLat = _argLat;
-	// // argLon = _argLon;
-	// // argAddress = _argAddress;
-	//
-	// // release thread
-	// this.notify();
-	// }
-	//
-	// // push location
-	// try {
-	// _pushLocation(_argLat, _argLon, _argAddress);
-	// } catch (Exception e) {
-	// }
-	// }
-
-	// /**
-	// * This method pushes a location with the already given credentials to the
-	// * server.
-	// *
-	// * @param lat The latitude of the location to push.
-	// * @param lon The longitude of the location to push.
-	// * @param address The address of the location to push. Optional, can be
-	// null.
-	// */
-	// public void pushLocation(double lat, double lon, String address) {
-	// // execute operation
-	// synchronized (this) {
-	// _argLat = lat;
-	// _argLon = lon;
-	// _argAddress = address;
-	//
-	// new Thread(this).start();
-	// try {
-	// this.wait();
-	// } catch (InterruptedException ie) {
-	// }
-	// }
-	// }
-
 	/**
+	 * pushes the location data to the server
 	 * @param lat
 	 * @param lon
 	 * @param address
 	 */
 	public void pushLocation(final double lat, final double lon,
 			final String address) {
+
+//		_pushLocation(lat, lon, address);
 		
 		new Thread(new Runnable() {
 			@Override
@@ -168,18 +101,25 @@ public class LocationServerApi {
 		}).start();
 	}
 
+	/**
+	 * 
+	 * @param lat
+	 * @param lon
+	 * @param address
+	 */
 	private void _pushLocation(double lat, double lon, String address) {
 
+		HttpClient client = new DefaultHttpClient(_manager, _params);
+
 		try {
-			// HttpClient hc = new DefaultHttpClient(_cm, _httpParams);
 
 			// create post request
 			HttpPost post = new HttpPost(_serverURL + "push_location");
 
 			// set parameters
 			List<NameValuePair> parameters = new ArrayList<NameValuePair>(5);
-			parameters.add(new BasicNameValuePair("user", this._username));
-			parameters.add(new BasicNameValuePair("pw", this._password));
+			parameters.add(_username);
+			parameters.add(_password);
 			parameters.add(new BasicNameValuePair("lat", "" + lat));
 			parameters.add(new BasicNameValuePair("lon", "" + lon));
 			if (address != null) {
@@ -188,7 +128,7 @@ public class LocationServerApi {
 			post.setEntity(new UrlEncodedFormEntity(parameters));
 
 			// execute request
-			HttpResponse response = _httpClient.execute(post);
+			HttpResponse response = client.execute(post);
 			Log.i(BaseActivity.TAG, "pushLocation: HTTP post: "
 					+ response.getStatusLine().getStatusCode());
 
@@ -203,6 +143,9 @@ public class LocationServerApi {
 			} else if (!line.startsWith("ok:")) {
 				Log.e(BaseActivity.TAG, "Pushing location failed.");
 			}
+
+			br.close();
+
 		} catch (UnsupportedEncodingException e) {
 			Log.e(BaseActivity.TAG, "push location: " + e);
 		} catch (ClientProtocolException e) {
@@ -211,6 +154,19 @@ public class LocationServerApi {
 			Log.e(BaseActivity.TAG, "push location: " + e);
 		} catch (IOException e) {
 			Log.e(BaseActivity.TAG, "push location: " + e);
+		}
+		
+//		finally {
+//			client.getConnectionManager().shutdown();
+//		}
+	}
+	
+	/**
+	 * shut down the connection manager
+	 */
+	public void close() {
+		if (_manager != null) {
+			_manager.shutdown();
 		}
 	}
 

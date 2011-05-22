@@ -30,11 +30,11 @@ public class LocationService extends Service implements LocationListener {
 
 	public static final int STATUS_STOPPED = 0;
 	public static final int STATUS_STARTED = 1;
-	public static final int STATUS_PAUSED = 2;
+//	public static final int STATUS_PAUSED = 2;
 
 	public static final int ACTION_STOP = 3;
 	public static final int ACTION_START = 4;
-	public static final int ACTION_PAUSE = 5;
+//	public static final int ACTION_PAUSE = 5;
 
 	public static final int UPDATE_STATUS = 6;
 	public static final int UPDATE_LOCATION = 7;
@@ -50,6 +50,7 @@ public class LocationService extends Service implements LocationListener {
 
 	private ServiceBinder binder;
 	private String username, password;
+	private LocationServerApi serverApi;
 
 	/**
 	 * when an activity binds to this service, it receives an instance of this
@@ -60,7 +61,6 @@ public class LocationService extends Service implements LocationListener {
 		/**
 		 * allows the activity to register itself with this service for
 		 * service-to-activity communication
-		 * 
 		 * @param activity
 		 */
 		void registerActivity(MainActivity ma) {
@@ -104,14 +104,15 @@ public class LocationService extends Service implements LocationListener {
 		int action = intent.getIntExtra("action", ACTION_START);
 
 		switch (action) {
+			
 			case ACTION_START:
-				username = intent.getStringExtra("username");
-				password = intent.getStringExtra("password");
-				int minutes = intent.getIntExtra("interval_minutes",
-						BaseActivity.DEFUALT_UPDATE_MIN);
-				int hours = intent.getIntExtra("interval_hours",
-						BaseActivity.DEFUALT_UPDATE_HRS);
-				updateInterval = getMilliseconds(minutes, hours);
+				getSettings(intent);
+				if (serverApi != null) {
+					serverApi.close();
+				}
+				serverApi = new LocationServerApi(username, password,
+						LocationServerApi.DEFAULT_SERVER_URL);
+
 				provider = findProvider();
 				if (status == STATUS_STARTED) {
 					locationManager.removeUpdates(this);
@@ -124,10 +125,9 @@ public class LocationService extends Service implements LocationListener {
 				status = STATUS_STOPPED;
 				stopSelf();
 				break;
-
-			case ACTION_PAUSE:
-				// TODO:
-				break;
+				
+//			case ACTION_PAUSE:
+//				break;
 		}
 
 		// If we get killed, after returning from here, restart
@@ -152,6 +152,20 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
+	 * 
+	 * @param intent
+	 */
+	private void getSettings(Intent intent) {
+		username = intent.getStringExtra("username");
+		password = intent.getStringExtra("password");
+		int minutes = intent.getIntExtra("interval_minutes",
+				BaseActivity.DEFUALT_UPDATE_MIN);
+		int hours = intent.getIntExtra("interval_hours",
+				BaseActivity.DEFUALT_UPDATE_HRS);
+		updateInterval = getMilliseconds(minutes, hours);
+	}
+
+	/**
 	 * Subscribe for location updates
 	 */
 	private void listenForLocation() {
@@ -171,6 +185,7 @@ public class LocationService extends Service implements LocationListener {
 	private void stopListening() {
 		Log.i(TAG, "LocationService: NOT listening for location!");
 		locationManager.removeUpdates(this);
+		serverApi.close();
 		status = STATUS_STOPPED;
 		notifyActivity(UPDATE_STATUS);
 		Toast.makeText(this, "service stopped", Toast.LENGTH_SHORT).show();
@@ -197,8 +212,8 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * called when a new location fix is acquired.
-	 * TODO transmit location to remote database.
+	 * called when a new location fix is acquired. TODO transmit location to
+	 * remote database.
 	 */
 	@Override
 	public void onLocationChanged(Location location) {
@@ -209,8 +224,10 @@ public class LocationService extends Service implements LocationListener {
 		Toast.makeText(this, "location updated", Toast.LENGTH_SHORT).show();
 		Log.d(TAG, "location = (" + location.getLatitude() + ","
 				+ location.getLongitude() + ")");
-		
-		// TODO transmit location
+
+		// transmit location:
+		serverApi.pushLocation(location.getLatitude(),
+				location.getLongitude(), null);
 	}
 
 	@Override
