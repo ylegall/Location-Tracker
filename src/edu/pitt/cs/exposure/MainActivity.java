@@ -48,7 +48,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Log.i(TAG, "MainActivity: onCreate");
+		Log.d(TAG, "MainActivity: onCreate");
 		
 		setContentView(R.layout.main);
 
@@ -77,7 +77,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 
 	@Override
 	protected void onDestroy() {
-		Log.i(TAG, "MainActivity: onDestroy");
+		Log.d(TAG, "MainActivity: onDestroy");
 		super.onDestroy();
 	}
 
@@ -134,8 +134,8 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		SharedPreferences.Editor editor = getPreferences(MODE_PRIVATE).edit();
 		editor.putInt("update_minutes", minuteSeek.getProgress());
 		editor.putInt("update_hours", hourSeek.getProgress());
-		editor.putString("username", username);
-		editor.putString("password", password);
+		if (username != null) { editor.putString("username", username); }
+		if (password != null) { editor.putString("password", password); }
 		editor.commit();
 	}
 
@@ -305,18 +305,25 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
+		
+		// if the user aborts, then no data is returned, so quit
+		if (data == null) {
+			finish();
+			return;
+		}
+		
 		switch (requestCode) {
 			case 0:
 				username = data.getStringExtra("username");
 				password = data.getStringExtra("password");
 				saveSettings();
 				if (LocationService.status == LocationService.STATUS_STARTED) {
-					
+					onClick(startButton);
 				}
 				break;
 		}
 	}
-
+	
 	/**
 	 * callback for when one of the list items is clicked
 	 * TODO: so something here?
