@@ -1,6 +1,9 @@
 package edu.pitt.cs.exposure;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.ComponentName;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -29,6 +32,8 @@ import edu.pitt.cs.exposure.LocationService.ServiceBinder;
 public class MainActivity extends BaseActivity implements OnClickListener,
 		OnSeekBarChangeListener, OnItemClickListener {
 
+	private static final int DIALOG_DETAIL = 0;
+	
 	private boolean isBound;
 	private ServiceBinder binder;
 	private ArrayAdapter<SimpleLocation> adapter;
@@ -331,6 +336,29 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 	@Override
 	public void onItemClick(AdapterView<?> av, View v, int i, long l) {
 		Log.i(TAG, "MainActivity: list item clicked");
+		Bundle args = new Bundle();
+		args.putInt("index", i);
+		showDialog(DIALOG_DETAIL,args);
+	}
+	
+	protected Dialog onCreateDialog(int id, Bundle args) {
+		int index = args.getInt("index");
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setCancelable(false);
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+			}
+		});
+		switch (id) {
+			case DIALOG_DETAIL:
+				SimpleLocation loc = (SimpleLocation)adapter.getItem(index);
+				String address = loc.getAddressString();
+				Log.w(TAG, "LoginActivity: empty username");
+				builder.setMessage(address);
+				break;
+		}
+		return builder.create();
 	}
 
 }

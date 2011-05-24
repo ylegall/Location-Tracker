@@ -18,11 +18,8 @@ import android.widget.Toast;
  * periodically. It is designed to only be accessed by the "MainActivity"
  * component, which runs in the same application/process.
  * 
- * getting username
- * http://stackoverflow.com/questions/2727029/how-can-i-get-the-
- * google-username-on-android
- * 
- * @author ylegall
+ * @author Yann Le Gall
+ * ylegall@gmail.com
  */
 public class LocationService extends Service implements LocationListener {
 
@@ -152,7 +149,8 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * 
+	 * gets the data that was sent to this service
+	 * from the specified intent.
 	 * @param intent
 	 */
 	private void getSettings(Intent intent) {
@@ -166,7 +164,7 @@ public class LocationService extends Service implements LocationListener {
 	}
 
 	/**
-	 * Subscribe for location updates
+	 * Subscribe for location updates.
 	 */
 	private void listenForLocation() {
 		Log.i(TAG, "LocationService: listening for location. interval = "
@@ -188,9 +186,12 @@ public class LocationService extends Service implements LocationListener {
 		if (serverApi != null) {
 			serverApi.close();
 		}
+		
+		if (status == STATUS_STARTED) {
+			Toast.makeText(this, "service stopped", Toast.LENGTH_SHORT).show();
+		}
 		status = STATUS_STOPPED;
 		notifyActivity(UPDATE_STATUS);
-		Toast.makeText(this, "service stopped", Toast.LENGTH_SHORT).show();
 	}
 
 	/**

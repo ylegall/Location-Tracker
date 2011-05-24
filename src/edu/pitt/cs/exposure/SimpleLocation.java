@@ -38,9 +38,15 @@ public class SimpleLocation extends Location {
 				if (addresses != null && !addresses.isEmpty()) {
 					Address a = addresses.get(0);
 					StringBuilder sb = new StringBuilder();
-					sb.append(a.getCountryName()).append(',');
-					sb.append(a.getLocality()).append(',');
-					sb.append(a.getPostalCode());
+					for (int i=0; i < a.getMaxAddressLineIndex(); i++) {
+						sb.append(a.getAddressLine(i)).append('\n');
+					}
+					
+//					sb.append(a.getCountryName()).append(',');
+//					sb.append(a.getLocality()).append(',');
+//					sb.append(a.get)
+//					sb.append(a.getPostalCode());
+					
 					return sb.toString();
 				}
 			} catch (Exception e) {
@@ -61,7 +67,7 @@ public class SimpleLocation extends Location {
 
 	@Override
 	public String toString() {
-		return getAddressString();
-		// return getCoordinateString();
+//		return getAddressString();
+		 return getCoordinateString();
 	}
 }
