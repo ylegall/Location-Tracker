@@ -1,6 +1,10 @@
 package edu.pitt.cs.exposure;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
@@ -24,6 +28,8 @@ import android.widget.Toast;
 public class LocationService extends Service implements LocationListener {
 
 	private static final String TAG = BaseActivity.TAG;
+	
+	private static final int NOTIFICATION_ID = 42;
 
 	public static final int STATUS_STOPPED = 0;
 	public static final int STATUS_STARTED = 1;
@@ -120,6 +126,7 @@ public class LocationService extends Service implements LocationListener {
 			case ACTION_STOP:
 				stopListening();
 				status = STATUS_STOPPED;
+				cancelNotification();
 				stopSelf();
 				break;
 				
@@ -175,8 +182,39 @@ public class LocationService extends Service implements LocationListener {
 		status = STATUS_STARTED;
 		notifyActivity(UPDATE_STATUS);
 		Toast.makeText(this, "service started", Toast.LENGTH_SHORT).show();
+		
+		makeNotification();
 	}
-
+	
+	/**
+	 * Makes a status bar notification.
+	 */
+	private void makeNotification() {
+		Log.i(TAG, "LocationService: making notification");
+		NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification notification = new Notification(
+				R.drawable.notifaction_icon,
+				"LocationTracker running",
+				System.currentTimeMillis());
+		
+		Context context = getApplicationContext();
+		Intent notificationIntent = new Intent(this, MainActivity.class);
+		PendingIntent intent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+		notification.setLatestEventInfo(context, "LocationTracker", "service running", intent);
+		notification.flags |= Notification.FLAG_NO_CLEAR;
+//		notification.flags |= Notification.FLAG_ONGOING_EVENT;
+		manager.notify(NOTIFICATION_ID, notification); // TODO: make the id a static value
+	}
+	
+	/**
+	 * removes the status bar notification
+	 */
+	private void cancelNotification() {
+		Log.i(TAG, "LocationService: removing notification");
+		NotificationManager manager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(NOTIFICATION_ID);
+	}
+	
 	/**
 	 * unsubscribe from location updates
 	 */
