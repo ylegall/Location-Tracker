@@ -297,11 +297,7 @@ public class MainActivity extends BaseActivity implements OnClickListener,
 		// if the service is running, then tell it to
 		// change the interval at which it receives location updates
 		if (LocationService.status == LocationService.STATUS_STARTED) {
-			Intent intent = new Intent(this, LocationService.class);
-			intent.putExtra("action", LocationService.ACTION_START);
-			intent.putExtra("interval_minutes", minuteSeek.getProgress());
-			intent.putExtra("interval_hours", hourSeek.getProgress());
-			startService(intent);
+			onClick(startButton);
 		}
 	}
 	

@@ -56,7 +56,7 @@ public class LoginActivity extends BaseActivity implements OnClickListener {
 		Log.i(TAG, "LoginActivity: setting result and finishing.");
 		Intent data = new Intent();
 		data.putExtra("username", userEdit.getText().toString());
-		data.putExtra("password", userEdit.getText().toString());
+		data.putExtra("password", passEdit.getText().toString());
 		setResult(RESULT_OK, data);
 		finish();
 	}
